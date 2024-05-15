@@ -542,6 +542,7 @@ void draw_detections(image im, int num, float thresh, box *boxes, float **probs,
             }
         }
     }
+    fclose(f);
 }
 
 void transpose_image(image im)
