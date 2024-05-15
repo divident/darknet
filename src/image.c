@@ -399,7 +399,7 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
      
         }
 
-        fclose(f);
+        //fclose(f);
     }
 
     // image output
