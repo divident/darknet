@@ -476,18 +476,29 @@ void draw_detections(image im, int num, float thresh, box *boxes, float **probs,
 {
     int i;
 
+    FILE *f = fopen("detections.txt", "w");
+    if (f == NULL)
+    {
+        printf("Error opening file!\n");
+        exit(1);
+    }
+
+
     for(i = 0; i < num; ++i){
         int class_id = max_index(probs[i], classes);
         float prob = probs[i][class_id];
         if(prob > thresh){
+            
+            fprintf(f, "x: %f, y: %f, w: %f, h: %f, class: %s, %.0f", boxes[i].x, boxes[i].y, boxes[i].w, boxes[i].h, names[class_id], prob * 100);
+
 
             //// for comparison with OpenCV version of DNN Darknet Yolo v2
-            //printf("\n %f, %f, %f, %f, ", boxes[i].x, boxes[i].y, boxes[i].w, boxes[i].h);
-            // int k;
-            //for (k = 0; k < classes; ++k) {
-            //    printf("%f, ", probs[i][k]);
-            //}
-            //printf("\n");
+            printf("\n %f, %f, %f, %f, ", boxes[i].x, boxes[i].y, boxes[i].w, boxes[i].h);
+            int k;
+            for (k = 0; k < classes; ++k) {
+               printf("%f, ", probs[i][k]);
+            }
+            printf("\n");
 
             int width = im.h * .012;
 
