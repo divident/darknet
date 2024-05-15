@@ -338,6 +338,14 @@ int compare_by_probs(const void *a_ptr, const void *b_ptr) {
 
 void draw_detections_v3(image im, detection *dets, int num, float thresh, char **names, image **alphabet, int classes, int ext_output)
 {
+
+    FILE *f = fopen("detections.txt", "w");
+    if (f == NULL)
+    {
+        printf("Error opening file!\n");
+        exit(1);
+    }
+
     static int frame_id = 0;
     frame_id++;
 
@@ -350,11 +358,20 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
     for (i = 0; i < selected_detections_num; ++i) {
         const int best_class = selected_detections[i].best_class;
         printf("%s: %.0f%%", names[best_class],    selected_detections[i].det.prob[best_class] * 100);
-        if (ext_output)
+        if (ext_output) {
+            fprintf(f, "x: %f, y: %f, w: %f, h: %f, class: %s, %.0f", 
+            round((selected_detections[i].det.bbox.x - selected_detections[i].det.bbox.w / 2)*im.w),
+            round((selected_detections[i].det.bbox.y - selected_detections[i].det.bbox.h / 2)*im.h), 
+            round(selected_detections[i].det.bbox.w*im.w), 
+            round(selected_detections[i].det.bbox.h*im.h),
+            names[best_class], selected_detections[i].det.prob[best_class] * 100
+            );
+
             printf("\t(left_x: %4.0f   top_y: %4.0f   width: %4.0f   height: %4.0f)\n",
                 round((selected_detections[i].det.bbox.x - selected_detections[i].det.bbox.w / 2)*im.w),
                 round((selected_detections[i].det.bbox.y - selected_detections[i].det.bbox.h / 2)*im.h),
                 round(selected_detections[i].det.bbox.w*im.w), round(selected_detections[i].det.bbox.h*im.h));
+        }
         else
             printf("\n");
         int j;
@@ -362,15 +379,27 @@ void draw_detections_v3(image im, detection *dets, int num, float thresh, char *
             if (selected_detections[i].det.prob[j] > thresh && j != best_class) {
                 printf("%s: %.0f%%", names[j], selected_detections[i].det.prob[j] * 100);
 
-                if (ext_output)
+                if (ext_output) {
+                                fprintf(f, "x: %f, y: %f, w: %f, h: %f, class: %s, %.0f", 
+            round((selected_detections[i].det.bbox.x - selected_detections[i].det.bbox.w / 2)*im.w),
+            round((selected_detections[i].det.bbox.y - selected_detections[i].det.bbox.h / 2)*im.h), 
+            round(selected_detections[i].det.bbox.w*im.w), 
+            round(selected_detections[i].det.bbox.h*im.h),
+            names[j], selected_detections[i].det.prob[j] * 100
+            );
+
                     printf("\t(left_x: %4.0f   top_y: %4.0f   width: %4.0f   height: %4.0f)\n",
                         round((selected_detections[i].det.bbox.x - selected_detections[i].det.bbox.w / 2)*im.w),
                         round((selected_detections[i].det.bbox.y - selected_detections[i].det.bbox.h / 2)*im.h),
                         round(selected_detections[i].det.bbox.w*im.w), round(selected_detections[i].det.bbox.h*im.h));
+                }
                 else
                     printf("\n");
             }
+     
         }
+
+        fclose(f);
     }
 
     // image output
